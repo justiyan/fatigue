@@ -140,15 +140,6 @@ export default function FatigueCalculator() {
       {/* Footer */}
       <footer className="bg-gray-800 text-white mt-12">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex flex-wrap justify-center space-x-4 text-sm mb-4">
-            <a href="#" className="hover:text-gray-300" data-testid="link-right-to-information">Right to information</a>
-            <span className="text-gray-500">-</span>
-            <a href="#" className="hover:text-gray-300" data-testid="link-terms-of-use">Terms of use</a>
-            <span className="text-gray-500">-</span>
-            <a href="#" className="hover:text-gray-300" data-testid="link-privacy-statement">Privacy statement</a>
-            <span className="text-gray-500">-</span>
-            <a href="#" className="hover:text-gray-300" data-testid="link-suppliers">Suppliers</a>
-          </div>
           <p className="text-center text-sm text-gray-400">
             Copyright 2025 Safe Places for Children. All rights reserved.
           </p>
