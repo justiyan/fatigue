@@ -195,12 +195,12 @@ export function SleepHistoryForm({ onCalculate, isCalculating }: SleepHistoryFor
             <div className="flex justify-center pt-4">
               <Button 
                 type="submit" 
-                className="bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
+                className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-none text-sm uppercase tracking-wide transition-colors duration-200"
                 disabled={isCalculating}
                 data-testid="button-calculate"
               >
-                <Calculator className="mr-2 h-4 w-4" />
-                {isCalculating ? 'Calculating...' : 'Calculate'}
+                {isCalculating ? 'Calculating...' : 'CALCULATE'}
+                <span className="ml-2">▶</span>
               </Button>
             </div>
           </form>

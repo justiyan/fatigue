@@ -69,13 +69,12 @@ export function FatigueResults({ result, onRecalculate }: FatigueResultsProps) {
 
         <div className="text-center">
           <Button 
-            variant="link" 
             onClick={onRecalculate}
-            className="text-primary hover:text-primary-dark font-medium"
+            className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-none text-sm uppercase tracking-wide transition-colors duration-200"
             data-testid="button-recalculate"
           >
-            <RotateCcw className="mr-1 h-4 w-4" />
-            Re-calculate
+            <span className="mr-2">◀</span>
+            RE-CALCULATE
           </Button>
         </div>
       </CardContent>
