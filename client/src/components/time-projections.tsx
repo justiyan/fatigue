@@ -137,7 +137,10 @@ export function TimeProjections({ projections, onRecalculate }: TimeProjectionsP
           </p>
           <div className="text-center">
             <Button 
-              onClick={onRecalculate}
+              onClick={() => {
+                console.log('Time projections START AGAIN button clicked');
+                onRecalculate();
+              }}
               className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-none text-sm uppercase tracking-wide transition-colors duration-200"
               data-testid="button-recalculate-projections"
             >
