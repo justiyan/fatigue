@@ -1,13 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Clock, RotateCcw } from "lucide-react";
 import { getFatigueLevelConfig } from "@/lib/fatigue-calculator";
 import type { TimeProjection } from "@shared/schema";
 
 interface TimeProjectionsProps {
   projections: TimeProjection[];
+  onRecalculate: () => void;
 }
 
-export function TimeProjections({ projections }: TimeProjectionsProps) {
+export function TimeProjections({ projections, onRecalculate }: TimeProjectionsProps) {
   // Group projections by level for display
   const groupedProjections = projections.reduce((acc, projection) => {
     if (!acc[projection.level]) {
@@ -129,10 +131,21 @@ export function TimeProjections({ projections }: TimeProjectionsProps) {
 
         {/* Summary text */}
         <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800">
+          <p className="text-sm text-blue-800 mb-3">
             This projection shows how your fatigue level may change over the next 24 hours based on your current sleep data and work schedule. 
             Times shown are when fatigue risk increases due to extended wakefulness and circadian rhythm factors.
           </p>
+          <div className="text-center">
+            <Button 
+              variant="link" 
+              onClick={onRecalculate}
+              className="text-primary hover:text-primary-dark font-medium"
+              data-testid="button-recalculate-projections"
+            >
+              <RotateCcw className="mr-1 h-4 w-4" />
+              Re-calculate
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

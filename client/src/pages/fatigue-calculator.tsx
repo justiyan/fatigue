@@ -98,7 +98,10 @@ export default function FatigueCalculator() {
 
         {/* Time Projections */}
         {result && (
-          <TimeProjections projections={result.projections} />
+          <TimeProjections 
+            projections={result.projections} 
+            onRecalculate={handleRecalculate}
+          />
         )}
 
         {/* Action Guidelines */}
