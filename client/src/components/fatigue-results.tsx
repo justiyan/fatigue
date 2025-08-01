@@ -74,7 +74,7 @@ export function FatigueResults({ result, onRecalculate }: FatigueResultsProps) {
             data-testid="button-recalculate"
           >
             <span className="mr-2">◀</span>
-            RE-CALCULATE
+            START AGAIN
           </Button>
         </div>
       </CardContent>

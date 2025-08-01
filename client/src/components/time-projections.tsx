@@ -142,7 +142,7 @@ export function TimeProjections({ projections, onRecalculate }: TimeProjectionsP
               data-testid="button-recalculate-projections"
             >
               <span className="mr-2">◀</span>
-              RE-CALCULATE
+              START AGAIN
             </Button>
           </div>
         </div>
