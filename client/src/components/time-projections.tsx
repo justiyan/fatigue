@@ -132,8 +132,8 @@ export function TimeProjections({ projections, onRecalculate }: TimeProjectionsP
         {/* Summary text */}
         <div className="mt-4 p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-blue-800 mb-3">
-            This projection shows how your fatigue level may change over the next 24 hours based on your current sleep data and work schedule. 
-            Times shown are when fatigue risk increases due to extended wakefulness and circadian rhythm factors.
+            This projection shows how your fatigue level will escalate over the next 24 hours without sleep recovery. 
+            Fatigue levels can only increase or stay the same during extended wakefulness - they do not decrease until adequate sleep is obtained.
           </p>
           <div className="text-center">
             <Button 

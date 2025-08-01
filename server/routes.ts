@@ -118,6 +118,7 @@ function generateTimeProjections(input: FatigueInput, workStartMinutes: number):
 
   // Start from work start time and project for 24 hours
   const startTime = workStartMinutes;
+  let maxFatigueScore = 0; // Track the highest fatigue level reached
   
   for (let i = 0; i < 24; i++) {
     const currentTimeMinutes = (startTime + (i * 60)) % (24 * 60);
@@ -130,7 +131,7 @@ function generateTimeProjections(input: FatigueInput, workStartMinutes: number):
     // Calculate fatigue score for this time
     let fatigueScore = 0;
     
-    // Sleep deficit scoring (same as current calculation)
+    // Sleep deficit scoring (baseline fatigue from lack of sleep)
     if (sleepLast24 < 5) fatigueScore += 4;
     else if (sleepLast24 < 6) fatigueScore += 3;
     else if (sleepLast24 < 7) fatigueScore += 2;
@@ -150,18 +151,18 @@ function generateTimeProjections(input: FatigueInput, workStartMinutes: number):
     
     const hoursAwake = timeAwakeMinutes / 60;
     
-    // Time awake penalty increases as hours progress
+    // Time awake penalty increases progressively (cumulative fatigue)
     if (hoursAwake > 18) fatigueScore += 4;
     else if (hoursAwake > 16) fatigueScore += 3;
     else if (hoursAwake > 14) fatigueScore += 2;
     else if (hoursAwake > 12) fatigueScore += 1;
     
-    // Night shift penalty (11pm to 5am)
+    // Night shift penalty (circadian rhythm disruption)
     if (currentHour >= 23 || currentHour <= 5) {
       fatigueScore += 2;
     }
     
-    // Early morning penalty (before 6am)
+    // Early morning penalty
     if (currentHour < 6 && currentHour > 0) {
       fatigueScore += 1;
     }
@@ -169,7 +170,12 @@ function generateTimeProjections(input: FatigueInput, workStartMinutes: number):
     // Cap score at 10
     fatigueScore = Math.min(10, Math.max(0, fatigueScore));
     
-    // Determine level
+    // Critical fix: Fatigue can only increase or stay the same during wakefulness
+    // Once you reach a fatigue level, you cannot drop below it without sleep
+    maxFatigueScore = Math.max(maxFatigueScore, fatigueScore);
+    fatigueScore = maxFatigueScore;
+    
+    // Determine level based on cumulative fatigue
     let level: 'Low' | 'Moderate' | 'High' | 'Extreme';
     if (fatigueScore <= 3) level = 'Low';
     else if (fatigueScore <= 6) level = 'Moderate';
