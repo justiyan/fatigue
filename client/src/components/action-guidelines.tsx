@@ -8,7 +8,7 @@ const actionGuidelines = [
     bgColor: 'bg-fatigue-low',
     hoverColor: 'hover:bg-green-50',
     iconColor: 'text-fatigue-low',
-    action: 'Good to go? Continue to monitor fatigue. Note the assessment on HazChat.',
+    action: 'Good to go? Continue to monitor fatigue.',
   },
   {
     level: 'Moderate',
@@ -16,7 +16,7 @@ const actionGuidelines = [
     bgColor: 'bg-fatigue-moderate',
     hoverColor: 'hover:bg-yellow-50',
     iconColor: 'text-fatigue-moderate',
-    action: 'Discuss with team/crew, decide on appropriate controls. Consider whether high risk tasks should occur. Advise Supervisor if appropriate. Controls may include self and peer monitoring, task rotation, increased breaks, pacing work load. Note the assessment and actions on HazChat.',
+    action: 'Discuss with leader or contact OnCall.',
   },
   {
     level: 'High',
@@ -24,7 +24,7 @@ const actionGuidelines = [
     bgColor: 'bg-fatigue-high',
     hoverColor: 'hover:bg-red-50',
     iconColor: 'text-fatigue-high',
-    action: 'Stop Work. Discuss controls with crew/team and with Supervisor. High risk tasks should not be performed. Controls may include increased supervision, task re-assignment, buddy check, arrange back-up, transport alternatives may be required. Note the assessment and actions on HazChat.',
+    action: 'Stop Work. Discuss with leader or contact OnCall.',
   },
   {
     level: 'Extreme',
@@ -32,7 +32,7 @@ const actionGuidelines = [
     bgColor: 'bg-fatigue-extreme',
     hoverColor: 'hover:bg-purple-50',
     iconColor: 'text-fatigue-extreme',
-    action: 'Stop Work (or do not commence). Discuss contingency with supervisor. Controls are unlikely to be sufficient. Make arrangements to convey worker home. Continuing with any work requires GM approval. Note the assessment and actions on HazChat.',
+    action: 'Stop Work (or do not commence). Discuss with leader or contact OnCall.',
   },
 ];
 
