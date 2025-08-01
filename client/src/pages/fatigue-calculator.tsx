@@ -107,7 +107,7 @@ export default function FatigueCalculator() {
                 <p className="text-sm text-gray-700">
                   Questions about the calculator?{' '}
                   <a 
-                    href="mailto:safety@safeplacesforchildren.org" 
+                    href="mailto:iyanbarry@gmail.com" 
                     className="text-primary hover:text-primary-dark font-medium underline"
                     data-testid="link-contact-email"
                   >
