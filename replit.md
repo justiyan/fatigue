@@ -1,6 +1,6 @@
 # Overview
 
-This is a fatigue calculation web application built with a React frontend and Express backend. The application allows workers to assess their fatigue levels by inputting sleep data and work schedules, providing safety recommendations based on industry standards. It's designed for workplace safety management, calculating fatigue scores and providing actionable guidelines to prevent fatigue-related incidents.
+This is a fatigue calculation web application built with a React frontend and Express backend. The application allows workers to assess their fatigue levels by inputting sleep data and work schedules, providing safety recommendations based on industry standards. It's designed for Safe Places for Children workplace safety management, calculating fatigue scores and providing actionable guidelines to prevent fatigue-related incidents.
 
 # User Preferences
 

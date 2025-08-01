@@ -59,7 +59,7 @@ export default function FatigueCalculator() {
             <Calculator className="text-2xl h-8 w-8" />
             <div>
               <h1 className="text-2xl font-bold">Fatigue Calculator</h1>
-              <p className="text-blue-100 text-sm">Energy Queensland Safety Tool</p>
+              <p className="text-blue-100 text-sm">Safe Places for Children Safety Tool</p>
             </div>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function FatigueCalculator() {
                 <p className="text-sm text-gray-700">
                   Questions about the calculator?{' '}
                   <a 
-                    href="mailto:occupationalhealth@energyq.com.au" 
+                    href="mailto:safety@safeplacesforchildren.org" 
                     className="text-primary hover:text-primary-dark font-medium underline"
                     data-testid="link-contact-email"
                   >
@@ -128,7 +128,7 @@ export default function FatigueCalculator() {
                 <h4 className="font-semibold text-gray-900 mb-2">Disclaimer</h4>
                 <p className="text-sm text-gray-700">
                   The information and data contained on this page including but not limited to the fatigue calculator 
-                  has been developed for Energy Queensland employee purposes only and shouldn't be relied upon for any 
+                  has been developed for Safe Places for Children employee purposes only and shouldn't be relied upon for any 
                   other purpose/s. No warranty or representation is made as to its accuracy or completeness.
                 </p>
               </div>
@@ -150,7 +150,7 @@ export default function FatigueCalculator() {
             <a href="#" className="hover:text-gray-300" data-testid="link-suppliers">Suppliers</a>
           </div>
           <p className="text-center text-sm text-gray-400">
-            Copyright 2025 Energy Queensland. All rights reserved.
+            Copyright 2025 Safe Places for Children. All rights reserved.
           </p>
         </div>
       </footer>
