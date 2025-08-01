@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { SleepHistoryForm } from "@/components/sleep-history-form";
 import { FatigueResults } from "@/components/fatigue-results";
 import { ActionGuidelines } from "@/components/action-guidelines";
+import { TimeProjections } from "@/components/time-projections";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calculator, Info, HelpCircle, AlertTriangle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
@@ -93,6 +94,11 @@ export default function FatigueCalculator() {
             result={result} 
             onRecalculate={handleRecalculate}
           />
+        )}
+
+        {/* Time Projections */}
+        {result && (
+          <TimeProjections projections={result.projections} />
         )}
 
         {/* Action Guidelines */}

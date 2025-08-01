@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { fatigueInputSchema, type FatigueInput, type FatigueResult } from "@shared/schema";
+import { fatigueInputSchema, type FatigueInput, type FatigueResult, type TimeProjection } from "@shared/schema";
 import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -100,10 +100,88 @@ function calculateFatigueScore(input: FatigueInput): FatigueResult {
   else if (fatigueScore <= 8) level = 'High';
   else level = 'Extreme';
   
+  // Generate hourly projections for the next 24 hours
+  const projections = generateTimeProjections(input, workTimeMinutes);
+
   return {
     score: fatigueScore,
     level,
     totalSleep48,
     hoursAwake: Math.round(hoursAwake * 10) / 10,
+    projections,
   };
+}
+
+function generateTimeProjections(input: FatigueInput, workStartMinutes: number): TimeProjection[] {
+  const { sleepLast24, sleepPrevious24, wakeTime } = input;
+  const projections: TimeProjection[] = [];
+
+  // Start from work start time and project for 24 hours
+  const startTime = workStartMinutes;
+  
+  for (let i = 0; i < 24; i++) {
+    const currentTimeMinutes = (startTime + (i * 60)) % (24 * 60);
+    const currentHour = Math.floor(currentTimeMinutes / 60);
+    const currentMinute = currentTimeMinutes % 60;
+    
+    // Format time as HH:MM
+    const timeString = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
+    
+    // Calculate fatigue score for this time
+    let fatigueScore = 0;
+    
+    // Sleep deficit scoring (same as current calculation)
+    if (sleepLast24 < 5) fatigueScore += 4;
+    else if (sleepLast24 < 6) fatigueScore += 3;
+    else if (sleepLast24 < 7) fatigueScore += 2;
+    else if (sleepLast24 < 8) fatigueScore += 1;
+    
+    const totalSleep48 = sleepLast24 + sleepPrevious24;
+    if (totalSleep48 < 12) fatigueScore += 3;
+    else if (totalSleep48 < 14) fatigueScore += 2;
+    else if (totalSleep48 < 16) fatigueScore += 1;
+    
+    // Calculate hours awake from wake time to current projected time
+    const [wakeHour, wakeMinute] = wakeTime.split(':').map(Number);
+    const wakeTimeMinutes = wakeHour * 60 + wakeMinute;
+    
+    let timeAwakeMinutes = currentTimeMinutes - wakeTimeMinutes;
+    if (timeAwakeMinutes < 0) timeAwakeMinutes += 24 * 60; // Handle next day
+    
+    const hoursAwake = timeAwakeMinutes / 60;
+    
+    // Time awake penalty increases as hours progress
+    if (hoursAwake > 18) fatigueScore += 4;
+    else if (hoursAwake > 16) fatigueScore += 3;
+    else if (hoursAwake > 14) fatigueScore += 2;
+    else if (hoursAwake > 12) fatigueScore += 1;
+    
+    // Night shift penalty (11pm to 5am)
+    if (currentHour >= 23 || currentHour <= 5) {
+      fatigueScore += 2;
+    }
+    
+    // Early morning penalty (before 6am)
+    if (currentHour < 6 && currentHour > 0) {
+      fatigueScore += 1;
+    }
+    
+    // Cap score at 10
+    fatigueScore = Math.min(10, Math.max(0, fatigueScore));
+    
+    // Determine level
+    let level: 'Low' | 'Moderate' | 'High' | 'Extreme';
+    if (fatigueScore <= 3) level = 'Low';
+    else if (fatigueScore <= 6) level = 'Moderate';
+    else if (fatigueScore <= 8) level = 'High';
+    else level = 'Extreme';
+    
+    projections.push({
+      time: timeString,
+      level,
+      score: fatigueScore,
+    });
+  }
+  
+  return projections;
 }
