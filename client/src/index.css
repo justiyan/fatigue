@@ -73,38 +73,6 @@
 }
 
 @layer utilities {
-  .text-fatigue-low {
-    color: hsl(var(--fatigue-low));
-  }
-  
-  .text-fatigue-moderate {
-    color: hsl(var(--fatigue-moderate));
-  }
-  
-  .text-fatigue-high {
-    color: hsl(var(--fatigue-high));
-  }
-  
-  .text-fatigue-extreme {
-    color: hsl(var(--fatigue-extreme));
-  }
-  
-  .bg-fatigue-low {
-    background-color: hsl(var(--fatigue-low));
-  }
-  
-  .bg-fatigue-moderate {
-    background-color: hsl(var(--fatigue-moderate));
-  }
-  
-  .bg-fatigue-high {
-    background-color: hsl(var(--fatigue-high));
-  }
-  
-  .bg-fatigue-extreme {
-    background-color: hsl(var(--fatigue-extreme));
-  }
-  
   .text-primary-dark {
     color: hsl(var(--primary-dark));
   }

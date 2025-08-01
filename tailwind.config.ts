@@ -61,6 +61,12 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        fatigue: {
+          low: "var(--fatigue-low)",
+          moderate: "var(--fatigue-moderate)",
+          high: "var(--fatigue-high)",
+          extreme: "var(--fatigue-extreme)",
+        },
       },
       keyframes: {
         "accordion-down": {
