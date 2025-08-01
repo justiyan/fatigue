@@ -12,9 +12,10 @@ import { useEffect } from "react";
 interface SleepHistoryFormProps {
   onCalculate: (data: FatigueInput) => void;
   isCalculating: boolean;
+  onSetResetFunction: (resetFn: () => void) => void;
 }
 
-export function SleepHistoryForm({ onCalculate, isCalculating }: SleepHistoryFormProps) {
+export function SleepHistoryForm({ onCalculate, isCalculating, onSetResetFunction }: SleepHistoryFormProps) {
   const timeOptions = generateTimeOptions();
   
   const form = useForm<FatigueInput>({
@@ -29,6 +30,19 @@ export function SleepHistoryForm({ onCalculate, isCalculating }: SleepHistoryFor
 
   const watchedValues = form.watch();
   const totalSleep48 = (watchedValues.sleepLast24 || 0) + (watchedValues.sleepPrevious24 || 0);
+
+  // Expose reset function to parent component
+  useEffect(() => {
+    const resetForm = () => {
+      form.reset({
+        sleepLast24: 0,
+        sleepPrevious24: 0,
+        wakeTime: "",
+        workStartTime: "",
+      });
+    };
+    onSetResetFunction(resetForm);
+  }, [form, onSetResetFunction]);
 
   // Auto-calculate when all fields are filled
   useEffect(() => {

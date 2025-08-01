@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { SleepHistoryForm } from "@/components/sleep-history-form";
 import { FatigueResults } from "@/components/fatigue-results";
@@ -13,6 +13,7 @@ import type { FatigueInput, FatigueResult } from "@shared/schema";
 export default function FatigueCalculator() {
   const [result, setResult] = useState<FatigueResult | null>(null);
   const { toast } = useToast();
+  const formResetRef = useRef<() => void>();
 
   const calculateMutation = useMutation({
     mutationFn: async (data: FatigueInput): Promise<FatigueResult> => {
@@ -45,10 +46,17 @@ export default function FatigueCalculator() {
 
   const handleRecalculate = () => {
     setResult(null);
-    const formElement = document.querySelector('[data-testid="fatigue-form"]');
-    if (formElement) {
-      formElement.scrollIntoView({ behavior: 'smooth' });
+    // Reset the form
+    if (formResetRef.current) {
+      formResetRef.current();
     }
+    // Scroll to form
+    setTimeout(() => {
+      const formElement = document.querySelector('[data-testid="fatigue-form"]');
+      if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   return (
@@ -86,6 +94,7 @@ export default function FatigueCalculator() {
         <SleepHistoryForm 
           onCalculate={handleCalculate} 
           isCalculating={calculateMutation.isPending}
+          onSetResetFunction={(resetFn) => { formResetRef.current = resetFn; }}
         />
 
         {/* Results Section */}
