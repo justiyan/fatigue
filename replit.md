@@ -24,9 +24,10 @@ Preferred communication style: Simple, everyday language.
 - **Error Handling**: Centralized error handling middleware
 
 ## Database and Storage
-- **Current**: In-memory storage using Map data structures
-- **Configured For**: PostgreSQL with Drizzle ORM ready for production deployment
+- **Current**: PostgreSQL database with Drizzle ORM for production deployment
+- **Schema**: Fatigue assessments table storing calculation history for audit purposes
 - **Migration Support**: Drizzle Kit configured for database schema management
+- **Storage**: DatabaseStorage implementation replacing in-memory storage
 
 ## Development Environment
 - **Build System**: Vite for frontend, esbuild for backend bundling

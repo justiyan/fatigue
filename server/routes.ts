@@ -1,17 +1,44 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { fatigueInputSchema, type FatigueInput, type FatigueResult } from "@shared/schema";
+import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Fatigue calculation endpoint
-  app.post("/api/calculate-fatigue", (req, res) => {
+  app.post("/api/calculate-fatigue", async (req, res) => {
     try {
       const input: FatigueInput = fatigueInputSchema.parse(req.body);
       
       const result = calculateFatigueScore(input);
+      
+      // Store the assessment in the database for audit purposes
+      await storage.createFatigueAssessment({
+        sleepLast24: input.sleepLast24,
+        sleepPrevious24: input.sleepPrevious24,
+        wakeTime: input.wakeTime,
+        workStartTime: input.workStartTime,
+        fatigueScore: result.score,
+        fatigueLevel: result.level,
+        totalSleep48: result.totalSleep48,
+        hoursAwake: result.hoursAwake.toString(),
+      });
+      
       res.json(result);
     } catch (error) {
+      console.error("Error processing fatigue calculation:", error);
       res.status(400).json({ message: "Invalid input data" });
+    }
+  });
+
+  // Get recent assessments endpoint (for audit/history purposes)
+  app.get("/api/fatigue-assessments", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      const assessments = await storage.getRecentFatigueAssessments(limit);
+      res.json(assessments);
+    } catch (error) {
+      console.error("Error fetching fatigue assessments:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 

@@ -1,38 +1,37 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { fatigueAssessments, type FatigueAssessment, type InsertFatigueAssessment } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createFatigueAssessment(assessment: InsertFatigueAssessment): Promise<FatigueAssessment>;
+  getFatigueAssessment(id: number): Promise<FatigueAssessment | undefined>;
+  getRecentFatigueAssessments(limit?: number): Promise<FatigueAssessment[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async createFatigueAssessment(assessment: InsertFatigueAssessment): Promise<FatigueAssessment> {
+    const [result] = await db
+      .insert(fatigueAssessments)
+      .values(assessment)
+      .returning();
+    return result;
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getFatigueAssessment(id: number): Promise<FatigueAssessment | undefined> {
+    const [result] = await db
+      .select()
+      .from(fatigueAssessments)
+      .where(eq(fatigueAssessments.id, id));
+    return result || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async getRecentFatigueAssessments(limit: number = 100): Promise<FatigueAssessment[]> {
+    return await db
+      .select()
+      .from(fatigueAssessments)
+      .orderBy(desc(fatigueAssessments.createdAt))
+      .limit(limit);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
