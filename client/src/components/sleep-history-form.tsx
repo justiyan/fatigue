@@ -45,18 +45,8 @@ export function SleepHistoryForm({ onCalculate, isCalculating, onSetResetFunctio
     onSetResetFunction(resetForm);
   }, [form, onSetResetFunction]);
 
-  // Auto-calculate when all fields are filled
-  useEffect(() => {
-    const { sleepLast24, sleepPrevious24, wakeTime, workStartTime } = watchedValues;
-    if (sleepLast24 !== undefined && sleepPrevious24 !== undefined && wakeTime && workStartTime) {
-      const timer = setTimeout(() => {
-        // Only scroll to results on first calculation (when no results exist yet)
-        const shouldScroll = !hasResults;
-        form.handleSubmit((data) => onCalculate(data, shouldScroll))();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [watchedValues, form, onCalculate, hasResults]);
+  // Removed auto-calculation to prevent scrolling issues
+  // Users must now click the CALCULATE button manually
 
   const onSubmit = (data: FatigueInput) => {
     // Manual button click should always scroll to results
