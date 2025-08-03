@@ -31,6 +31,12 @@ export function SleepHistoryForm({ onCalculate, isCalculating, onSetResetFunctio
 
   const watchedValues = form.watch();
   const totalSleep48 = (watchedValues.sleepLast24 || 0) + (watchedValues.sleepPrevious24 || 0);
+  
+  // Debug form state
+  useEffect(() => {
+    console.log('Form errors:', form.formState.errors);
+    console.log('isCalculating prop:', isCalculating);
+  }, [form.formState.errors, isCalculating]);
 
   // Expose reset function to parent component
   useEffect(() => {
@@ -49,6 +55,7 @@ export function SleepHistoryForm({ onCalculate, isCalculating, onSetResetFunctio
   // Users must now click the CALCULATE button manually
 
   const onSubmit = (data: FatigueInput) => {
+    console.log('Form submitted with data:', data);
     // Manual button click should always scroll to results
     onCalculate(data, true);
   };
@@ -207,8 +214,14 @@ export function SleepHistoryForm({ onCalculate, isCalculating, onSetResetFunctio
                 disabled={isCalculating}
                 data-testid="button-calculate"
               >
-                {isCalculating ? 'Calculating...' : 'CALCULATE'}
-                <span className="ml-2">▶</span>
+                {isCalculating ? (
+                  <>CALCULATING...</>
+                ) : (
+                  <>
+                    CALCULATE
+                    <span className="ml-2">▶</span>
+                  </>
+                )}
               </Button>
             </div>
           </form>
