@@ -14,6 +14,7 @@ export default function FatigueCalculator() {
   const [result, setResult] = useState<FatigueResult | null>(null);
   const { toast } = useToast();
   const formResetRef = useRef<() => void>();
+  const [shouldScrollToResults, setShouldScrollToResults] = useState(false);
 
   const calculateMutation = useMutation({
     mutationFn: async (data: FatigueInput): Promise<FatigueResult> => {
@@ -23,13 +24,16 @@ export default function FatigueCalculator() {
     onSuccess: (data) => {
       setResult(data);
       
-      // Scroll to results
-      setTimeout(() => {
-        const resultsElement = document.querySelector('[data-testid="fatigue-results"]');
-        if (resultsElement) {
-          resultsElement.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
+      // Only scroll to results if explicitly requested (manual submission or first auto-calc)
+      if (shouldScrollToResults) {
+        setTimeout(() => {
+          const resultsElement = document.querySelector('[data-testid="fatigue-results"]');
+          if (resultsElement) {
+            resultsElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+        setShouldScrollToResults(false); // Reset the flag
+      }
     },
     onError: () => {
       toast({
@@ -40,7 +44,8 @@ export default function FatigueCalculator() {
     },
   });
 
-  const handleCalculate = (data: FatigueInput) => {
+  const handleCalculate = (data: FatigueInput, shouldScroll: boolean = false) => {
+    setShouldScrollToResults(shouldScroll);
     calculateMutation.mutate(data);
   };
 
@@ -95,6 +100,7 @@ export default function FatigueCalculator() {
           onCalculate={handleCalculate} 
           isCalculating={calculateMutation.isPending}
           onSetResetFunction={(resetFn) => { formResetRef.current = resetFn; }}
+          hasResults={!!result}
         />
 
         {/* Results Section */}

@@ -10,12 +10,13 @@ import { generateTimeOptions } from "@/lib/fatigue-calculator";
 import { useEffect } from "react";
 
 interface SleepHistoryFormProps {
-  onCalculate: (data: FatigueInput) => void;
+  onCalculate: (data: FatigueInput, shouldScroll?: boolean) => void;
   isCalculating: boolean;
   onSetResetFunction: (resetFn: () => void) => void;
+  hasResults: boolean;
 }
 
-export function SleepHistoryForm({ onCalculate, isCalculating, onSetResetFunction }: SleepHistoryFormProps) {
+export function SleepHistoryForm({ onCalculate, isCalculating, onSetResetFunction, hasResults }: SleepHistoryFormProps) {
   const timeOptions = generateTimeOptions();
   
   const form = useForm<FatigueInput>({
@@ -49,14 +50,17 @@ export function SleepHistoryForm({ onCalculate, isCalculating, onSetResetFunctio
     const { sleepLast24, sleepPrevious24, wakeTime, workStartTime } = watchedValues;
     if (sleepLast24 !== undefined && sleepPrevious24 !== undefined && wakeTime && workStartTime) {
       const timer = setTimeout(() => {
-        form.handleSubmit(onCalculate)();
+        // Only scroll to results on first calculation (when no results exist yet)
+        const shouldScroll = !hasResults;
+        form.handleSubmit((data) => onCalculate(data, shouldScroll))();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [watchedValues, form, onCalculate]);
+  }, [watchedValues, form, onCalculate, hasResults]);
 
   const onSubmit = (data: FatigueInput) => {
-    onCalculate(data);
+    // Manual button click should always scroll to results
+    onCalculate(data, true);
   };
 
   const generateHourOptions = () => {
