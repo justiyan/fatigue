@@ -1,20 +1,54 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { fatigueInputSchema, type FatigueInput, type FatigueResult, type TimeProjection } from "../shared/schema";
+import { z } from 'zod';
+
+// Define schemas directly in the serverless function to avoid import issues
+const fatigueInputSchema = z.object({
+  sleepLast24: z.number().min(0).max(24),
+  sleepPrevious24: z.number().min(0).max(24),
+  wakeTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
+  workStartTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
+});
+
+type FatigueInput = z.infer<typeof fatigueInputSchema>;
+type TimeProjection = {
+  time: string;
+  level: 'Low' | 'Moderate' | 'High' | 'Extreme';
+  score: number;
+};
+type FatigueResult = {
+  score: number;
+  level: 'Low' | 'Moderate' | 'High' | 'Extreme';
+  totalSleep48: number;
+  hoursAwake: number;
+  projections: TimeProjection[];
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('API called with method:', req.method);
+  console.log('Request body:', req.body);
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
     const input: FatigueInput = fatigueInputSchema.parse(req.body);
+    console.log('Input validated successfully:', input);
 
     const result = calculateFatigueScore(input);
+    console.log('Calculation completed:', result);
 
     res.json(result);
   } catch (error) {
     console.error("Error processing fatigue calculation:", error);
-    res.status(400).json({ message: "Invalid input data" });
+    console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
+
+    if (error instanceof z.ZodError) {
+      console.error("Zod validation errors:", error.errors);
+      res.status(400).json({ message: "Invalid input data", errors: error.errors });
+    } else {
+      res.status(500).json({ message: "Internal server error" });
+    }
   }
 }
 
