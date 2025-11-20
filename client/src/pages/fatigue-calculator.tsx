@@ -35,7 +35,9 @@ export default function FatigueCalculator() {
         setShouldScrollToResults(false); // Reset the flag
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Calculation failed:", error);
+      console.error("Error message:", error.message);
       toast({
         title: "Calculation Error",
         description: "Unable to calculate fatigue score. Please check your inputs and try again.",
