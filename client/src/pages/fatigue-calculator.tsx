@@ -75,7 +75,6 @@ export default function FatigueCalculator() {
             <Calculator className="text-2xl h-8 w-8" />
             <div>
               <h1 className="text-2xl font-bold">Fatigue Calculator</h1>
-              <p className="text-blue-100 text-sm">Safe Places for Children Safety Tool</p>
             </div>
           </div>
         </div>
@@ -153,9 +152,9 @@ export default function FatigueCalculator() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Disclaimer</h4>
                 <p className="text-sm text-gray-700">
-                  The information and data contained on this page including but not limited to the fatigue calculator 
-                  has been developed for Safe Places for Children employee purposes only and shouldn't be relied upon for any 
-                  other purpose/s. No warranty or representation is made as to its accuracy or completeness.
+                  The information and data contained on this page including but not limited to the fatigue calculator
+                  is provided for informational purposes only and shouldn't be relied upon for any
+                  critical safety decisions. No warranty or representation is made as to its accuracy or completeness.
                 </p>
               </div>
             </div>
@@ -167,7 +166,7 @@ export default function FatigueCalculator() {
       <footer className="bg-gray-800 text-white mt-12">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <p className="text-center text-sm text-gray-400">
-            Copyright 2025 Safe Places for Children. All rights reserved.
+            Copyright 2025 Iyan Barry. All rights reserved.
           </p>
         </div>
       </footer>
