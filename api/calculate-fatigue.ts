@@ -2,18 +2,57 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
 
 // Define schemas directly in the serverless function to avoid import issues
+const symptomChecklistSchema = z.object({
+  // Alertness and concentration
+  strugglingAlert: z.boolean().default(false),
+  troubleConcentrating: z.boolean().default(false),
+  unusualMistakes: z.boolean().default(false),
+  slowResponses: z.boolean().default(false),
+
+  // Physical signs
+  yawningFrequently: z.boolean().default(false),
+  physicalSymptoms: z.boolean().default(false),
+  hardToStayAwake: z.boolean().default(false),
+  poorCoordination: z.boolean().default(false),
+
+  // Mood and behaviour
+  moodChanges: z.boolean().default(false),
+  decisionDifficulty: z.boolean().default(false),
+  feelingOverwhelmed: z.boolean().default(false),
+  concernsRaised: z.boolean().default(false),
+
+  // High-risk work
+  requiredToDrive: z.boolean().default(false),
+  administerMedication: z.boolean().default(false),
+  highBehavioralSupport: z.boolean().default(false),
+  workingAlone: z.boolean().default(false),
+
+  // Overnight disruption
+  brokenSleep: z.boolean().default(false),
+  overnightSupport: z.boolean().default(false),
+  overnightIncident: z.boolean().default(false),
+  insufficientRest: z.boolean().default(false),
+});
+
 const fatigueInputSchema = z.object({
   sleepLast24: z.number().min(0).max(24),
   sleepPrevious24: z.number().min(0).max(24),
   wakeTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
   workStartTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
+  symptomChecklist: symptomChecklistSchema.optional(),
 });
 
+type SymptomChecklist = z.infer<typeof symptomChecklistSchema>;
 type FatigueInput = z.infer<typeof fatigueInputSchema>;
 type TimeProjection = {
   time: string;
   level: 'Low' | 'Moderate' | 'High' | 'Extreme';
   score: number;
+};
+type SymptomResult = {
+  symptomScore: number;
+  symptomLevel: 'Low' | 'Moderate' | 'High' | 'Extreme';
+  hasHighRiskWork: boolean;
 };
 type FatigueResult = {
   score: number;
@@ -21,6 +60,7 @@ type FatigueResult = {
   totalSleep48: number;
   hoursAwake: number;
   projections: TimeProjection[];
+  symptomResult?: SymptomResult;
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -52,8 +92,50 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+function calculateSymptomScore(checklist: SymptomChecklist): SymptomResult {
+  let score = 0;
+  let hasHighRiskWork = false;
+
+  // Regular symptoms (1 point each)
+  const regularSymptoms = [
+    'strugglingAlert', 'troubleConcentrating', 'unusualMistakes', 'slowResponses',
+    'yawningFrequently', 'physicalSymptoms', 'hardToStayAwake', 'poorCoordination',
+    'moodChanges', 'decisionDifficulty', 'feelingOverwhelmed', 'concernsRaised',
+    'brokenSleep', 'overnightSupport', 'overnightIncident', 'insufficientRest'
+  ] as const;
+
+  // High-risk work (2 points each)
+  const highRiskSymptoms = [
+    'requiredToDrive', 'administerMedication', 'highBehavioralSupport', 'workingAlone'
+  ] as const;
+
+  regularSymptoms.forEach(symptom => {
+    if (checklist[symptom]) score += 1;
+  });
+
+  highRiskSymptoms.forEach(symptom => {
+    if (checklist[symptom]) {
+      score += 2;
+      hasHighRiskWork = true;
+    }
+  });
+
+  // Determine symptom level
+  let symptomLevel: 'Low' | 'Moderate' | 'High' | 'Extreme';
+  if (score <= 2) symptomLevel = 'Low';
+  else if (score <= 5) symptomLevel = 'Moderate';
+  else if (score <= 8) symptomLevel = 'High';
+  else symptomLevel = 'Extreme';
+
+  return {
+    symptomScore: score,
+    symptomLevel,
+    hasHighRiskWork,
+  };
+}
+
 function calculateFatigueScore(input: FatigueInput): FatigueResult {
-  const { sleepLast24, sleepPrevious24, wakeTime, workStartTime } = input;
+  const { sleepLast24, sleepPrevious24, wakeTime, workStartTime, symptomChecklist } = input;
 
   let fatigueScore = 0;
 
@@ -109,12 +191,19 @@ function calculateFatigueScore(input: FatigueInput): FatigueResult {
   // Generate hourly projections for the next 24 hours
   const projections = generateTimeProjections(input, workTimeMinutes);
 
+  // Calculate symptom result if checklist provided
+  let symptomResult: SymptomResult | undefined;
+  if (symptomChecklist) {
+    symptomResult = calculateSymptomScore(symptomChecklist);
+  }
+
   return {
     score: fatigueScore,
     level,
     totalSleep48,
     hoursAwake: Math.round(hoursAwake * 10) / 10,
     projections,
+    symptomResult,
   };
 }
 

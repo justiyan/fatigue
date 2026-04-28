@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { SleepHistoryForm } from "@/components/sleep-history-form";
+import { SymptomChecklistForm } from "@/components/symptom-checklist-form";
 import { FatigueResults } from "@/components/fatigue-results";
 import { ActionGuidelines } from "@/components/action-guidelines";
 import { TimeProjections } from "@/components/time-projections";
@@ -8,17 +9,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calculator, Info, HelpCircle, AlertTriangle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { FatigueInput, FatigueResult } from "@shared/schema";
+import type { FatigueInput, FatigueResult, SymptomChecklist } from "@shared/schema";
 
 export default function FatigueCalculator() {
   const [result, setResult] = useState<FatigueResult | null>(null);
+  const [symptomChecklist, setSymptomChecklist] = useState<SymptomChecklist | null>(null);
   const { toast } = useToast();
   const formResetRef = useRef<() => void>();
+  const checklistResetRef = useRef<() => void>();
   const [shouldScrollToResults, setShouldScrollToResults] = useState(false);
 
   const calculateMutation = useMutation({
     mutationFn: async (data: FatigueInput): Promise<FatigueResult> => {
-      const response = await apiRequest("POST", "/api/calculate-fatigue", data);
+      // Add symptom checklist to the calculation request if available
+      const requestData = {
+        ...data,
+        symptomChecklist: symptomChecklist || undefined,
+      };
+      const response = await apiRequest("POST", "/api/calculate-fatigue", requestData);
       return response.json();
     },
     onSuccess: (data) => {
@@ -53,17 +61,25 @@ export default function FatigueCalculator() {
 
   const handleRecalculate = () => {
     setResult(null);
-    // Reset the form
+    setSymptomChecklist(null);
+    // Reset both forms
     if (formResetRef.current) {
       formResetRef.current();
     }
-    // Scroll to form
+    if (checklistResetRef.current) {
+      checklistResetRef.current();
+    }
+    // Scroll to top
     setTimeout(() => {
-      const formElement = document.querySelector('[data-testid="fatigue-form"]');
-      if (formElement) {
-        formElement.scrollIntoView({ behavior: 'smooth' });
+      const checklistElement = document.querySelector('[data-testid="symptom-checklist-form"]');
+      if (checklistElement) {
+        checklistElement.scrollIntoView({ behavior: 'smooth' });
       }
     }, 100);
+  };
+
+  const handleChecklistChange = (checklist: SymptomChecklist) => {
+    setSymptomChecklist(checklist);
   };
 
   return (
@@ -96,6 +112,12 @@ export default function FatigueCalculator() {
           </CardContent>
         </Card>
 
+        {/* Symptom Checklist */}
+        <SymptomChecklistForm
+          onChecklistChange={handleChecklistChange}
+          onSetResetFunction={(resetFn) => { checklistResetRef.current = resetFn; }}
+        />
+
         {/* Calculator Form */}
         <SleepHistoryForm 
           onCalculate={handleCalculate} 
@@ -106,10 +128,33 @@ export default function FatigueCalculator() {
 
         {/* Results Section */}
         {result && (
-          <FatigueResults 
-            result={result} 
-            onRecalculate={handleRecalculate}
-          />
+          <>
+            {/* Combined Risk Alert if symptoms are high/extreme */}
+            {result.symptomResult && (result.symptomResult.symptomLevel === 'High' || result.symptomResult.symptomLevel === 'Extreme') && (
+              <Card className="bg-red-50 border border-red-300">
+                <CardContent className="pt-6">
+                  <div className="flex items-start space-x-3">
+                    <AlertTriangle className="text-red-600 text-xl mt-1 h-5 w-5" />
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Combined Risk Assessment</h4>
+                      <p className="text-sm text-gray-700">
+                        {result.symptomResult.symptomLevel === 'Extreme'
+                          ? "Critical fatigue warning: Both symptom assessment and sleep history indicate extreme fatigue risk. Immediate escalation required. Do not proceed with high-risk work."
+                          : result.symptomResult.hasHighRiskWork
+                          ? "High fatigue warning: Multiple fatigue symptoms detected with high-risk work identified. Review controls before proceeding."
+                          : "High fatigue warning: Multiple fatigue symptoms detected. Additional controls may be required before proceeding with work."}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <FatigueResults
+              result={result}
+              onRecalculate={handleRecalculate}
+            />
+          </>
         )}
 
         {/* Time Projections */}
